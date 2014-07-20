@@ -222,32 +222,32 @@ int main(void)
 		/* Display time in infinite loop */
 		Time_Show();
 		while(Lcd_On){
-            GPIO_WriteBit(LCD_PORT, Bl, Bit_SET);
-            lcd_clear();
-            lcd_gotoxy(1,1);
-            char pass=0;
-            while(Lcd_On && (pass<3)){				
-                lcd_putsf(menu[password]);
-                int i;
-                for(i=0; i<4;i++){
-					lcd_gotoxy(2,(i+6));
-                    lcd_putsf("*");
-                    if(Key_Pressed()==Pass[i]) {
-                        pass++;
-                    }
-                }
-                if(pass==3) pass=4;
-                else {
-                    pass=0;
-                    lcd_clear();
-					lcd_gotoxy(1,1);
-                    lcd_putsf(menu[wrongpassword]);
-                    delay_ms(250);
-                   }
-            }
-			int i=0;
-			while(Lcd_On){
-                lcd_clear();
+        	 GPIO_WriteBit(LCD_PORT, Bl, Bit_SET);
+            	lcd_clear();
+            	lcd_gotoxy(1,1);
+            	char pass=0;
+	        while(Lcd_On && (pass<3)){				
+	                lcd_putsf(menu[password]);
+	                int i;
+	                for(i=0; i<4;i++){
+						lcd_gotoxy(2,(i+6));
+	                    lcd_putsf("*");
+	                    if(Key_Pressed()==Pass[i]) {
+	                        pass++;
+	                    }
+	                }
+	                if(pass==3) pass=4;
+	                else {
+	                    pass=0;
+	                    lcd_clear();
+						lcd_gotoxy(1,1);
+	                    lcd_putsf(menu[wrongpassword]);
+	                    delay_ms(250);
+	                   }
+	            }
+				int i=0;
+				while(Lcd_On){
+	                lcd_clear();
 				lcd_gotoxy(1,1);
 				lcd_putsf(menu[i]);
 				lcd_cursor_blink();
@@ -268,14 +268,16 @@ int main(void)
 							}
 						break;
 					case Esc:
-                        Lcd_On=0;
+                        			Lcd_On=0;
 						break;
 					case Ok:
-                        if (i==0)
-                            Time_Set();
-                        else if (i==1)
-                            Show_Task();
-
+        					 if (i==0)
+                        			 	Time_Set();
+                				else if (i==1)
+                            				Show_Task();
+                            			else if (i==2)
+                            				Manual();
+	
 						break;
 					default:
 						break;
@@ -857,6 +859,61 @@ void print(int i,int j,int a,int b,int c){
 		lcd_putsf(tmp);
 	}
 }
+void Manual(void){
+    while(1){
+        char P_on=0,F_on=0,L_on=0;
+        lcd_clear();
+        delay_ms(100);
+        lcd_gotoxy(1,1);
+        lcd_putsf("Manual:");
+        lcd_gotoxy(1,7);
+		sprintf(tmp,"p:%1d*f:%1d*l:%1d",P_on,F_on,L_on);
+		lcd_putsf(tmp);
+        switch (Key_Pressed()) {
+                case Up:
+                    if(F_on){
+                        delay_ms(3000);
+                        GPIO_SetBits(GPIOB,Fan);
+                        F_on=0;
+                        }
+                    else{
+                        delay_ms(3000);
+                        GPIO_ResetBits(GPIOB,Fan);
+                        F_on=1;
+                        }
+                    break;
+                case Ok:
+                    if(P_on){
+                        delay_ms(3000);
+                        GPIO_SetBits(GPIOB,Pump);
+                        P_on=0;
+                        }
+                    else{
+                        delay_ms(3000);
+                        GPIO_ResetBits(GPIOB,Pump);
+                        p_on=1;
+                        }
+                case Down:
+                    if(L_on){
+                        delay_ms(3000);
+                        GPIO_SetBits(GPIOB,Lamp);
+                        L_on=0;
+                        }
+                    else{
+                        delay_ms(3000);
+                        GPIO_ResetBits(GPIOB,Lamp);
+                        L_on=1;
+                        }
+                case Esc:
+                    return ;
+                    break;
+                default:
+                    break;
+            }
+            
+    }
+}
+
 /**
   * @brief  This function handles RTC global interrupt request.
   * @param  None
